@@ -15,7 +15,7 @@ const middlewareType = ( req , res , next ) => {
     
     const {type} = req.params
 
-    const validType = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s'-]+$/.test(type.trim())
+    const validType = /^(vegana|sin-gluten)$/i.test(type.trim());
     console.log(validType)
 
     if( validType ){

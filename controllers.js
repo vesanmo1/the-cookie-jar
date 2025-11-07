@@ -1,53 +1,81 @@
-const getCookies = ( req , res , next) => {
+const { Cookie } = require('./schemas')
+
+const getCookies = async ( req , res , next) => {
+
+    const search = await Cookie.find()
+    
     res
         .status(200)
-        .json({message : `Haciendo get en / cookies` , data : []})
+        .json({message : `Haciendo get en /cookies` , data : search})
 }
 
-const getCookiesByType = ( req , res , next) => {
+const getCookiesByType = async ( req , res , next) => {
 
     const { type } = req.params
-    res
-        .status(201)
-        .json({ message : `Mostrando todas las galletas ${type}` , data : [] })
-}
 
-const postCookies = ( req , res , next) => {
-
-    const { cookie_img , cookie_name , description , type } = req.body
+    const search = await Cookie.find({ type })
 
     res
         .status(201)
-        .json({     message: 'Añadiendo cookie',
-                    cookie_img,
-                    cookie_name,
-                    description,
-                    type,
-                    data: []});  
+        .json({ message : `Mostrando todas las cookies que son ${type}` , data : search })
 }
 
-const putCookies = ( req , res , next) => {
+const postCookies = async ( req , res , next) => {
+
+    const { cookie_name , description , type , img_url } = req.body
+
+    const newCookie = new Cookie({
+        cookie_name,
+        description,
+        type,
+        img_url
+    })
+
+    await newCookie.save()
+    const search = await Cookie.find()
+
+    res
+        .status(201)
+        .json({     
+            message: 'Añadiendo cookie',                    
+            details: newCookie,
+            data: search
+        });  
+}
+
+const putCookies = async ( req , res , next) => {
 
     const { _id } = req.params
-    const { cookie_img , cookie_name , description , type } = req.body
+    const { cookie_name , description , type , img_url } = req.body
+
+    const update = await Cookie.findByIdAndUpdate( _id , { cookie_name , description , type , img_url })
+
+    const search = await Cookie.find()
 
     res
         .status(200)
-        .json({     message: `Actualizando la cookie con _id ${_id}`,
-                    cookie_img,
-                    cookie_name,
-                    description,
-                    type,
-                    data: []});  
+        .json({     
+            message: `Actualizando la cookie con _id ${_id}`,
+            details: update,
+            data: search
+        }); 
 }
 
-const deleteCookies = ( req , res , next) => {
+const deleteCookies = async ( req , res , next) => {
 
     const { _id } = req.params
 
+    const deleteCookie = await Cookie.findByIdAndDelete( _id )
+
+    const search = await Cookie.find()
+
     res
         .status(200)
-        .json({message : `Eliminando la cookie con _id ${_id}` , data : []})
+        .json({
+            message : `Eliminando la cookie con _id ${_id}`,
+            details: deleteCookie,
+            data : search
+        })
 }
 
 
